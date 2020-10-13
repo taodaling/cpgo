@@ -51,7 +51,7 @@ func run(testName, progName, input, output string, ch chan<- string) {
 	cmd.Stdout = outbuf
 	cmd.Stderr = errbuf
 	time.AfterFunc(10*time.Second, func() {
-		syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
+		syscall.Kill(cmd.Process.Pid, syscall.SIGKILL)
 	})
 	now := time.Now()
 	err := cmd.Run()
