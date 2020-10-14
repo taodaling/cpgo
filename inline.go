@@ -30,7 +30,6 @@ func rec(content string, added map[string]bool, wd string) string {
 }
 
 func Inline(wd string) {
-	log.Println("Now inline work")
 	merge := loadFile(make(map[string]bool), wd+string(os.PathSeparator)+"main.cpp")
 	ioutil.WriteFile(wd+string(os.PathSeparator)+"inline.cpp", []byte(merge), os.FileMode(0777))
 	fmt.Fprintln(os.Stdout, "INLINE SUCCESS, PLEASE VIEW inline.cpp")
