@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -58,6 +59,7 @@ func ServerEntry(wd string) {
 			ioutil.WriteFile(strconv.Itoa(i)+".in", []byte(test.Input), os.FileMode(0777))
 			ioutil.WriteFile(strconv.Itoa(i)+".out", []byte(test.Output), os.FileMode(0777))
 		}
+		fmt.Fprintf(os.Stdout, "READ PROBLEM %v\n", body.Name)
 	})
 
 	log.Println("Server booting...")

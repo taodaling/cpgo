@@ -40,6 +40,14 @@ func checkResult(expect, actual string) error {
 	return nil
 }
 
+func red(content string) string {
+	return fmt.Sprintf("\033[31m%v\033[0m", content)
+}
+
+func green(content string) string {
+	return fmt.Sprintf("\033[32m%v\033[0m", content)
+}
+
 func run(testName, progName, input, output string, ch chan<- string) {
 	res := new(bytes.Buffer)
 
@@ -61,13 +69,13 @@ func run(testName, progName, input, output string, ch chan<- string) {
 	delta := time.Now().Sub(now).Milliseconds()
 	fmt.Fprintf(res, "%vms:", delta)
 	if err != nil {
-		fmt.Fprintf(res, "ERROR:%v", delta, err.Error())
+		fmt.Fprintf(res, "\033[35mERROR\033[0m:%v", delta, err.Error())
 	} else {
 		err = checkResult(output, outbuf.String())
 		if err != nil {
-			fmt.Fprintf(res, "WA:%v", err.Error())
+			fmt.Fprintf(res, "\033[31mWA\033[0m:%v", err.Error())
 		} else {
-			fmt.Fprintf(res, "PASS")
+			fmt.Fprintf(res, "\033[32mPASS\033[0m")
 		}
 	}
 	ch <- res.String()
@@ -95,7 +103,8 @@ func TestEntry(wd string) {
 			log.Println("\nCan't collect file:", err)
 			continue
 		} else {
-			fmt.Fprintln(os.Stdout, "Detect program has changed, run tests...")
+			fmt.Fprint(os.Stdout, "\033[2J\033[0;0H")
+			fmt.Fprintf(os.Stdout, "[%v]Detect program has changed, run tests...\n", time.Now().Format("15:04:05"))
 			inputs := filesBySuffix["in"]
 			outputs := filesBySuffix["out"]
 			sort.Strings(inputs)
