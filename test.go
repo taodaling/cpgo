@@ -124,6 +124,10 @@ func TestEntry(wd string) {
 				fmt.Fprintln(os.Stdout, msg)
 			}
 			fmt.Fprintln(os.Stdout, "All test has done!\n")
+			//inline file at last
+			log.Println("Begin inline")
+			Inline(wd)
+			log.Println("Inline finish")
 		}
 	}
 }
