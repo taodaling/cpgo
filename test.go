@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -15,6 +16,27 @@ import (
 	"syscall"
 	"time"
 )
+
+const SUCCESS = 0
+const WA = 1
+const ERROR = 2
+
+type TestResult struct {
+	Input, Output, Actual, Msg string
+	State                      int
+}
+
+func (t *TestResult) Format(w io.Writer) {
+	var content = t.Msg
+	if t.State == SUCCESS {
+		content = Green(content)
+	} else if t.State == WA {
+		content = Red(content)
+	} else if t.State == ERROR {
+		content = Purple(content)
+	}
+	fmt.Fprintln(w, content)
+}
 
 func fetchWords(s string) []string {
 	scanner := bufio.NewScanner(strings.NewReader(s))
@@ -40,15 +62,7 @@ func checkResult(expect, actual string) error {
 	return nil
 }
 
-func red(content string) string {
-	return fmt.Sprintf("\033[31m%v\033[0m", content)
-}
-
-func green(content string) string {
-	return fmt.Sprintf("\033[32m%v\033[0m", content)
-}
-
-func run(testName, progName, input, output string, ch chan<- string) {
+func run(testName, progName, input, output string, ch chan<- TestResult) {
 	res := new(bytes.Buffer)
 
 	fmt.Fprintf(res, "TESTCASE %v:", testName)
@@ -67,21 +81,32 @@ func run(testName, progName, input, output string, ch chan<- string) {
 	now := time.Now()
 	err := cmd.Run()
 	delta := time.Now().Sub(now).Milliseconds()
+	actual := outbuf.String()
+	result := TestResult{
+		Input:  input,
+		Output: output,
+		Actual: actual,
+	}
 	fmt.Fprintf(res, "%vms:", delta)
 	if err != nil {
-		fmt.Fprintf(res, "\033[35mERROR\033[0m:%v", delta, err.Error())
+		fmt.Fprintf(res, "ERROR:%v", delta, err.Error())
+		result.State = ERROR
 	} else {
-		err = checkResult(output, outbuf.String())
+		err = checkResult(output, actual)
 		if err != nil {
-			fmt.Fprintf(res, "\033[31mWA\033[0m:%v", err.Error())
+			fmt.Fprintf(res, "WA:%v", err.Error())
+			result.State = WA
 		} else {
-			fmt.Fprintf(res, "\033[32mPASS\033[0m")
+			fmt.Fprintf(res, "PASS")
+			result.State = SUCCESS
 		}
 	}
-	ch <- res.String()
+
+	result.Msg = res.String()
+	ch <- result
 }
 
-func runEntry(progName, inputFile, outputFile string, ch chan<- string) {
+func RunEntry(progName, inputFile, outputFile string, ch chan<- TestResult) {
 	input, _ := ioutil.ReadFile(inputFile)
 	output, _ := ioutil.ReadFile(outputFile)
 	run(inputFile, progName, string(input), string(output), ch)
@@ -113,15 +138,15 @@ func TestEntry(wd string) {
 				log.Println("The number of input and output doesn't match")
 				continue
 			}
-			var chans []chan string
+			var chans []chan TestResult
 			for i := 0; i < len(inputs); i++ {
-				ch := make(chan string)
+				ch := make(chan TestResult)
 				chans = append(chans, ch)
-				go runEntry(progName, inputs[i], outputs[i], ch)
+				go RunEntry(progName, inputs[i], outputs[i], ch)
 			}
 			for _, ch := range chans {
-				msg := <-ch
-				fmt.Fprintln(os.Stdout, msg)
+				result := <-ch
+				result.Format(os.Stdout)
 			}
 			fmt.Fprintln(os.Stdout, "All test has done!\n")
 			//inline file at last
