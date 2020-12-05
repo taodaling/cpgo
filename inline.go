@@ -17,7 +17,12 @@ func loadFile(added map[string]bool, path string) string {
 	}
 	added[path] = true
 	headerContent, _ := ioutil.ReadFile(path)
-	return rec(string(headerContent), added, filepath.Dir(path))
+
+	//replace some unused token
+	pragma, _ := regexp.Compile(`#pragma once`)
+	replaced := pragma.ReplaceAllString(string(headerContent), "")
+
+	return rec(replaced, added, filepath.Dir(path))
 }
 
 func rec(content string, added map[string]bool, wd string) string {
@@ -25,6 +30,10 @@ func rec(content string, added map[string]bool, wd string) string {
 	return includeRe.ReplaceAllStringFunc(content, func(match string) string {
 		sub := includeRe.FindSubmatch([]byte(match))
 		headerName := string(sub[1])
+		//don't inline those files
+		if headerName == "prettyprint.h" {
+			return ""
+		}
 		return loadFile(added, wd+string(os.PathSeparator)+headerName)
 	})
 }

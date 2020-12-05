@@ -15,6 +15,7 @@ import (
 	"strings"
 	"syscall"
 	"time"
+	"runtime"
 )
 
 const SUCCESS = 0
@@ -115,6 +116,11 @@ func RunEntry(progName, inputFile, outputFile string, ch chan<- TestResult) {
 func TestEntry(wd string) {
 	lastModify := time.Now()
 	progName := wd + string(os.PathSeparator) + "main"
+	sysType := runtime.GOOS
+	if sysType == "windows" {
+        progName += ".exe"
+    }
+
 	for {
 		time.Sleep(time.Second)
 
@@ -135,7 +141,7 @@ func TestEntry(wd string) {
 			sort.Strings(inputs)
 			sort.Strings(outputs)
 			if len(inputs) != len(outputs) {
-				log.Println("The number of input and output doesn't match")
+				fmt.Fprintf(os.Stdout, "The number of input and output doesn't match")
 				continue
 			}
 			var chans []chan TestResult
