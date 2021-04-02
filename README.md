@@ -1,6 +1,6 @@
 # cpgo
 
-It's a server for competitive companion and also a test framework for C++
+It's a server for competitive companion, a test framework for C++, and implement simple inline mechanism for competitive programming.
 
 # How to use it 
 
