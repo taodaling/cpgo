@@ -24,3 +24,10 @@ into a new file named `inline.cpp`. You can submit this file with all library in
 # How to parse task from web page
 
 Install competitive companion and add a new port `50823` to it.
+
+# Where can I get library
+
+There are lots of cool libraries, I'll mention some:
+
+- [ac-library](https://github.com/atcoder/ac-library)
+- [kactl](https://github.com/kth-competitive-programming/kactl)
