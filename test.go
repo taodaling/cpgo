@@ -129,6 +129,9 @@ func TestEntry(wd string) {
 		} else {
 			lastModify = stat.ModTime()
 		}
+		
+		//inline file at first
+		Inline(wd)
 
 		if filesBySuffix, err := CollectFile(wd); err != nil {
 			log.Println("\nCan't collect file:", err)
@@ -155,8 +158,6 @@ func TestEntry(wd string) {
 				result.Format(os.Stdout)
 			}
 			fmt.Fprintln(os.Stdout, "All test has done!\n")
-			//inline file at last
-			Inline(wd)
 		}
 	}
 }
