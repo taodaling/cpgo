@@ -9,7 +9,7 @@ import (
 	"regexp"
 	"runtime"
 	"strings"
-)
+) 
 
 func loadFile(added map[string]bool, path string, includePaths []string) string {
 	log.Println("load file", path)
@@ -24,7 +24,7 @@ func loadFile(added map[string]bool, path string, includePaths []string) string 
 	pragma, _ := regexp.Compile(`#pragma once`)
 	replaced := pragma.ReplaceAllString(string(headerContent), "")
 
-	return rec(replaced, added, filepath.Dir(path), includePaths)
+	return "\n//file [" + path + "] begin\n" + rec(replaced, added, filepath.Dir(path), includePaths) + "\n//file [" + path + "] end\n"
 }
 
 func existFile(path string)bool{
