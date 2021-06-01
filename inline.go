@@ -33,7 +33,7 @@ func existFile(path string)bool{
 }
 
 func rec(content string, added map[string]bool, wd string, includePaths []string) string {
-	includeRe, _ := regexp.Compile(`#include\s*"(.*)"`)
+	includeRe, _ := regexp.Compile(`(?m)^#include\s*"(.*)"`)
 	return includeRe.ReplaceAllStringFunc(content, func(match string) string {
 		sub := includeRe.FindSubmatch([]byte(match))
 		headerName := string(sub[1])

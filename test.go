@@ -134,17 +134,17 @@ func TestEntry(wd string) {
 		Inline(wd)
 
 		if filesBySuffix, err := CollectFile(wd); err != nil {
-			log.Println("\nCan't collect file:", err)
+			log.Println("\nCannot collect files:", err)
 			continue
 		} else {
 			fmt.Fprint(os.Stdout, "\033[2J\033[0;0H")
-			fmt.Fprintf(os.Stdout, "[%v]Detect program has changed, run tests...\n", time.Now().Format("15:04:05"))
+			fmt.Fprintf(os.Stdout, "[%v]Detect program changed, run tests...\n", time.Now().Format("15:04:05"))
 			inputs := filesBySuffix["in"]
 			outputs := filesBySuffix["out"]
 			sort.Strings(inputs)
 			sort.Strings(outputs)
 			if len(inputs) != len(outputs) {
-				fmt.Fprintf(os.Stdout, "The number of input and output doesn't match")
+				fmt.Fprintf(os.Stdout, "The number of inputs and outputs doesn't match")
 				continue
 			}
 			var chans []chan TestResult
@@ -157,7 +157,7 @@ func TestEntry(wd string) {
 				result := <-ch
 				result.Format(os.Stdout)
 			}
-			fmt.Fprintln(os.Stdout, "All test has done!\n")
+			fmt.Fprintln(os.Stdout, "All tests had done!\n")
 		}
 	}
 }
